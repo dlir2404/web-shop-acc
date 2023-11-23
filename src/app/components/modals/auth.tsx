@@ -54,17 +54,8 @@ const registerContent = () => {
                 >
                     <Input.Password />
                 </Form.Item>
-
-                {/* <Form.Item<FieldType>
-                    name="remember"
-                    valuePropName="checked"
-                    wrapperCol={{ offset: 8, span: 16 }}
-                >
-                    <Checkbox>Remember me</Checkbox>
-                </Form.Item> */}
-
                 <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                    <Button type="primary" htmlType="submit">
+                    <Button className='bg-[#1677ff]' type="primary" htmlType="submit">
                         Đăng ký
                     </Button>
                 </Form.Item>
@@ -111,7 +102,7 @@ const loginContent = () => {
                 </Form.Item>
 
                 <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                    <Button type="primary" htmlType="submit">
+                    <Button className='bg-[#1677ff]' type="primary" htmlType="submit">
                         Đăng nhập
                     </Button>
                 </Form.Item>
@@ -120,44 +111,29 @@ const loginContent = () => {
     )
 }
 
-const registerTab = () => {
-    return {
-        label: `Đăng ký`,
-        key: 'register',
-        children: registerContent(),
-        // style: i === 0 ? { height: 200 } : undefined,
-    };
-}
-
-const loginTab = () => {
-    return {
+const items = [
+    {
         label: `Đăng nhập`,
         key: 'login',
         children: loginContent(),
-        // style: i === 0 ? { height: 200 } : undefined,
-    };
-}
+    },
+    {
+        label: `Đăng ký`,
+        key: 'register',
+        children: registerContent(),
+    }
+]
 
-// const items = new Array(3).fill(null).map((_, i) => {
-//     const id = String(i + 1);
-//     return {
-//         label: `Tab ${id}`,
-//         key: id,
-//         children: `Content of Tab Pane ${id}`,
-//         // style: i === 0 ? { height: 200 } : undefined,
-//     };
-// });
-const items = new Array(3).fill(null)
-items[0] = loginTab
-items[1] = registerTab
 
 const AuthModal = (
     {
         isModalOpen,
-        setIsModalOpen
+        setIsModalOpen,
+        defaultActiveKey,
     }: {
         isModalOpen: boolean,
-        setIsModalOpen: (v: boolean) => void
+        setIsModalOpen: (v: boolean) => void,
+        defaultActiveKey: string,
     }
 ) => {
     const {
@@ -177,18 +153,18 @@ const AuthModal = (
         setIsModalOpen(false);
     };
 
-
     return (
         <>
-            <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                <Tabs defaultActiveKey="login" renderTabBar={renderTabBar}>
-                    <Tabs.TabPane tab={loginTab().label} key={loginTab().key}>
-                        {loginTab().children}
-                    </Tabs.TabPane>
-                    <Tabs.TabPane tab={registerTab().label} key={registerTab().key}>
-                        {registerTab().children}
-                    </Tabs.TabPane>
-                </Tabs>;
+            <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={[
+                <Button key="back" onClick={handleCancel}>
+                    Hủy
+                </Button>,
+                <Button className='bg-[#1677ff]' key="submit" type="primary" onClick={handleOk}>
+                    Ok
+                </Button>,
+
+            ]}>
+                <Tabs defaultActiveKey={defaultActiveKey} renderTabBar={renderTabBar} items={items}></Tabs>;
             </Modal>
         </>
     )
