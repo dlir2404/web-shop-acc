@@ -22,20 +22,21 @@ const Footer = () => {
                                 <p className="text-white"><span className="text-yellow-600">GIAO DỊCH UY TÍN 24/24</span>{' '} các ngày trong tuần</p>
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 mt-4">
-                            <div className="text-white">
-                                <p>Acc đã bán ra:</p>
-                                <p>Tổng số thành viên: </p>
-                                <p>Đang online: </p>
-                                <p>Số lần truy cập: </p>
+                        <div className="text-white">
+                            <div className="grid grid-cols-2 mt-4">
+                                <p>Acc đã bán ra:</p> <p className="text-rose-600">36.584</p>
                             </div>
-                            <div className="text-rose-600">
-                                <p>36.584</p>
-                                <p>170.422</p>
-                                <p>1</p>
-                                <p>18.936.412</p>
+                            <div className="grid grid-cols-2">
+                                <p>Tổng số thành viên: </p> <p className="text-rose-600">170.422</p>
+                            </div>
+                            <div className="grid grid-cols-2">
+                                <p>Đang online: </p> <p className="text-rose-600">1</p>
+                            </div>
+                            <div className="grid grid-cols-2">
+                                <p>Số lần truy cập: </p> <p className="text-rose-600">18.936.412</p>
                             </div>
                         </div>
+
                         <div>
                             <p className='text-white inline'>Liên kết chia sẻ: </p>
                             <div className='inline-flex gap-2 mt-3 ml-3'>
@@ -59,7 +60,7 @@ const Footer = () => {
                     </div>
                     <div className="mx-auto py-6 text-white text-center">
                         <p>Địa chỉ: Định Công, Hoàng Mai, Hà Nội</p>
-                        <p>© 2023, Copyright by Shop Acc Liên Quân Mobile Giá Rẻ - Uy Tín.</p>
+                        <p>© 2023, Copyright by Shop Acc Đình Linh Giá Rẻ - Uy Tín.</p>
                     </div>
                 </div>
             </div>

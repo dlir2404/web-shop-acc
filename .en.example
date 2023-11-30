@@ -1,0 +1,2 @@
+#this is used for uploading file to cloudinary without sign from server
+UNSIGNED_UPLOAD_PRESET=

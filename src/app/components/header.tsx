@@ -16,8 +16,8 @@ const Header = () => {
       <Menu mode={'horizontal'}>
         <Menu.Item key="homepage">Trang chủ</Menu.Item>
         <Menu.Item key="features">Thông tin shop</Menu.Item>
-        <Menu.Item key="about">Hướng dẫn mua/bán acc</Menu.Item>
-        <Menu.Item key="contact">Contact Us</Menu.Item>
+        <Menu.Item key="about">Hướng dẫn</Menu.Item>
+        <Menu.Item key="contact">Liên hệ</Menu.Item>
       </Menu>
     );
   };
