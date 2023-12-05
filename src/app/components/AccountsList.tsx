@@ -19,27 +19,29 @@ const AccountsList = () => {
     })
 
     if (isLoading) {
+        const skeletonItems = Array.from({ length: 10 }, (_, index) => (
+            <Card
+                key={index}
+                style={{ width: 250, marginTop: 16 }}
+                actions={[
+                    <Skeleton.Button key={`button-${index}`} />
+                ]}
+            >
+                <Skeleton.Image key={`image-${index}`} active className="mb-4 w-full h-80px" />
+                <Skeleton key={`skeleton-${index}`} title={false} paragraph={{ rows: 2 }} />
+            </Card>
+        ));
         return (
-            <div>
-                <Card
-                    style={{ width: 300, marginTop: 16 }}
-                    actions={[
-                        <SettingOutlined key="setting" />,
-                        <EditOutlined key="edit" />,
-                        <EllipsisOutlined key="ellipsis" />,
-                    ]}
-                >
-                    <Skeleton loading={true} avatar active>
-                        <Meta
-                            avatar={<Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel&key=2" />}
-                            title="Card title"
-                            description="This is the description"
-                        />
-                    </Skeleton>
-                </Card>
+            <div className="grid gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 ">
+                {skeletonItems}
             </div>
         )
     }
+
+    const handleBuy = (id: any) => {
+        console.log(id)
+    }
+
 
 
     return (
@@ -63,10 +65,13 @@ const AccountsList = () => {
                                     </div>
                                     <div>
                                         <p>Tướng: <strong>{account.heroes_num}</strong></p>
-                                        <p>Full ngọc: <strong>{account.is_full_gems ? account.is_full_gems : 'Không'}</strong></p>
+                                        <p>Full ngọc: <strong>{account.is_full_gems ? (account.is_full_gems == true ? 'Đúng' : 'Không') : 'Không'}</strong></p>
                                     </div>
                                 </div>
-                                <Button className="flex justify-center text-center gap-2 items-center mx-auto">
+                                <Button
+                                    className="flex justify-center text-center gap-2 items-center mx-auto"
+                                    onClick={() => { handleBuy(account.id) }}
+                                >
                                     <ShoppingCartOutlined />
                                     <p>Mua ngay</p>
                                 </Button>

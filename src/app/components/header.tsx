@@ -1,15 +1,22 @@
 'use client'
-import { Menu, Avatar, Drawer, Layout } from "antd";
+import { Menu, Avatar, Drawer, Layout, message } from "antd";
 import { UserOutlined, CodeOutlined, LogoutOutlined, MenuOutlined } from "@ant-design/icons";
 import Button from "antd/es/button";
 import React, { useState } from "react";
 import AuthModal from "./modals/auth";
+import localStorageService from "../services/localStorage.service";
 
 const Header = () => {
   const [visible, setVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [user, setUser] = useState<string | null | undefined>(localStorageService.getValue('DINH_LINH_SHOP_TOKEN'))
   const [defaultActiveKey, setDefaultActiveKey] = useState('');
 
+  const handleLogout = () => {
+    localStorageService.cleanAll()
+    setUser(null)
+    message.success('Đăng xuất thành công')
+  }
 
   const LeftMenu = ({ mode }: { mode: any }) => {
     return (
@@ -64,7 +71,7 @@ const Header = () => {
           <Menu.Item key="about-us">
             <UserOutlined /> Profile
           </Menu.Item>
-          <Menu.Item key="log-out">
+          <Menu.Item key="log-out" onClick={handleLogout}>
             <LogoutOutlined /> Logout
           </Menu.Item>
         </Menu.SubMenu>
@@ -90,7 +97,7 @@ const Header = () => {
                   <LeftMenu mode={"horizontal"} />
                 </div>
                 <div className="rightMenu">
-                  <RightMenuLogouted mode={"horizontal"} />
+                  {user ? (<RightMenuLogined mode={'horizontal'}></RightMenuLogined>) : (<RightMenuLogouted mode={"horizontal"} />)}
                 </div>
 
                 <Button className="menuButton" type="text" onClick={showDrawer}>
@@ -112,7 +119,13 @@ const Header = () => {
           </Layout.Header>
         </Layout>
       </nav>
-      {isModalOpen && <AuthModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} defaultActiveKey={defaultActiveKey}></AuthModal>}
+      {isModalOpen &&
+        <AuthModal
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+          setUser={setUser}
+          defaultActiveKey={defaultActiveKey}
+        ></AuthModal>}
     </>
   );
 };
