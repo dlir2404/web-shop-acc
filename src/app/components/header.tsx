@@ -16,9 +16,11 @@ const Header = () => {
     localStorageService.cleanAll()
     setUser(null)
     message.success('Đăng xuất thành công')
+    console.log('dang xuat')
   }
 
   const LeftMenu = ({ mode }: { mode: any }) => {
+    
     return (
       <Menu mode={'horizontal'}>
         <Menu.Item key="homepage">Trang chủ</Menu.Item>

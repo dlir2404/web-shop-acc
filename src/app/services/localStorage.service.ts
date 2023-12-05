@@ -2,7 +2,6 @@
 
 class storageService {
     setValue = (key: string, value: any) => {
-        if (typeof window === 'undefined') return
         try {
             const serializedValue = JSON.stringify(value)
             localStorage.setItem(key, serializedValue)
@@ -12,7 +11,6 @@ class storageService {
     }
     
     getValue = (key: string) => {
-        if (typeof window === 'undefined') return
         try {
             const serializedValue = localStorage.getItem(key)
             if (!serializedValue) return

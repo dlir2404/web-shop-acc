@@ -37,8 +37,6 @@ const AuthModal = (
         </StickyBox>
     );
 
-    //message
-    
 
     //logic
     const onFinish = (values: any) => {
@@ -67,7 +65,7 @@ const AuthModal = (
         mutationFn: (body: ILogin) => authService.login(body),
         onSuccess(data, variables, context) {
             message.success('Đăng nhập thành công')
-            setIsModalOpen(false)    
+            // setIsModalOpen(false)    
             localStorageService.setValue('DINH_LINH_SHOP_TOKEN', 'Bearer ' + data.data.accessToken)
             setUser(data.data.username)
         },
