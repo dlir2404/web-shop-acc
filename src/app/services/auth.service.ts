@@ -1,4 +1,4 @@
-import { ILogin, ILoginResponse, IRegister } from "../shared/type/auth.type";
+import { ILogin, ILoginResponse, IRegister, IRegisterResponse } from "../shared/type/auth.type";
 import http from "../utils/http";
 
 const authService = {
@@ -7,7 +7,7 @@ const authService = {
         return data
     },
     register: async (values: IRegister) => {
-        const data = await http.post('/api/auth/register', values)
+        const data = await http.post<IRegisterResponse>('/api/auth/register', values)
         return data
     }
 }

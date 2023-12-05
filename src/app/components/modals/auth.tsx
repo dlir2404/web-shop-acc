@@ -64,8 +64,8 @@ const AuthModal = (
     const loginMutation = useMutation({
         mutationFn: (body: ILogin) => authService.login(body),
         onSuccess(data, variables, context) {
-            message.success('Đăng nhập thành công')
-            // setIsModalOpen(false)    
+            message.success('Đăng nhập thành công.')
+            setIsModalOpen(false)
             localStorageService.setValue('DINH_LINH_SHOP_TOKEN', 'Bearer ' + data.data.accessToken)
             setUser(data.data.username)
         },
@@ -76,11 +76,13 @@ const AuthModal = (
 
     const registerMutation = useMutation({
         mutationFn: (body: IRegister) => authService.register(body),
-        onSuccess(data) {
+        onSuccess(data, variables, context) {
             message.success('Đăng ký thành công.')
+            localStorageService.setValue('DINH_LINH_SHOP_TOKEN', 'Bearer ' + data.data.accessToken)
+            setUser(data.data.username)
             setIsModalOpen(false)
         },
-        onError(error : any) {
+        onError(error: any) {
             message.error(error.response.data.message)
         }
     })

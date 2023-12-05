@@ -5,6 +5,7 @@ import Button from "antd/es/button";
 import React, { useState } from "react";
 import AuthModal from "./modals/auth";
 import localStorageService from "../services/localStorage.service";
+import { useEffect } from "react";
 
 const Header = () => {
   const [visible, setVisible] = useState(false);
@@ -12,38 +13,57 @@ const Header = () => {
   const [user, setUser] = useState<string | null | undefined>(localStorageService.getValue('DINH_LINH_SHOP_TOKEN'))
   const [defaultActiveKey, setDefaultActiveKey] = useState('');
 
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const handleLogout = () => {
     localStorageService.cleanAll()
     setUser(null)
     message.success('Đăng xuất thành công')
-    console.log('dang xuat')
   }
 
   const LeftMenu = ({ mode }: { mode: any }) => {
-    
+    const items = [
+      {
+        label: 'Trang chủ',
+        key: 'homepage'
+      },
+      {
+        label: 'Thông tin shop',
+        key: 'info'
+      },
+      {
+        label: 'Hướng dẫn',
+        key: 'about'
+      },
+      {
+        label: 'Liên hệ',
+        key: 'contact'
+      },
+    ]
     return (
-      <Menu mode={'horizontal'}>
-        <Menu.Item key="homepage">Trang chủ</Menu.Item>
-        <Menu.Item key="features">Thông tin shop</Menu.Item>
-        <Menu.Item key="about">Hướng dẫn</Menu.Item>
-        <Menu.Item key="contact">Liên hệ</Menu.Item>
-      </Menu>
+      <Menu mode="horizontal" items={items}></Menu>
     );
   };
 
   const RightMenuLogouted = ({ mode }: { mode: any }) => {
-    return (
-      <Menu mode={mode}>
-        <Button
-          className="mr-4"
+    const items = [
+      {
+        label: <Button
           onClick={() => {
             setDefaultActiveKey('register')
             setIsModalOpen(true)
           }}
         >
           Đăng ký
-        </Button>
-        <Button
+        </Button>,
+        key: 'register'
+      },
+      {
+        label: <Button
           className="bg-black text-white"
           onClick={() => {
             setDefaultActiveKey('login')
@@ -51,33 +71,45 @@ const Header = () => {
           }}
         >
           Đăng nhập
-        </Button>
-      </Menu>
+        </Button>,
+        key: 'login'
+      }
+    ]
+    return (
+      <Menu mode={mode} items={items}></Menu>
     )
   }
 
   const RightMenuLogined = ({ mode }: { mode: any }) => {
+    const items = [
+      {
+        label: <>
+          <Avatar icon={<UserOutlined />} />
+          <span className="username">User name</span>
+        </>,
+        key: 'submenu',
+        children: [
+          {
+            label: 'Projects',
+            key: 'project',
+            icon: <CodeOutlined />
+          },
+          {
+            label: 'Profile',
+            key: 'profile',
+            icon: <UserOutlined />
+          },
+          {
+            label: 'Logout',
+            key: 'logout',
+            icon: <LogoutOutlined />,
+            onClick: handleLogout
+          },
+        ]
+      }
+    ]
     return (
-      <Menu mode={mode}>
-        <Menu.SubMenu
-          title={
-            <>
-              <Avatar icon={<UserOutlined />} />
-              <span className="username">User name</span>
-            </>
-          }
-        >
-          <Menu.Item key="project">
-            <CodeOutlined /> Projects
-          </Menu.Item>
-          <Menu.Item key="about-us">
-            <UserOutlined /> Profile
-          </Menu.Item>
-          <Menu.Item key="log-out" onClick={handleLogout}>
-            <LogoutOutlined /> Logout
-          </Menu.Item>
-        </Menu.SubMenu>
-      </Menu>
+      <Menu mode={mode} items={items}></Menu>
     );
   };
 
@@ -99,7 +131,11 @@ const Header = () => {
                   <LeftMenu mode={"horizontal"} />
                 </div>
                 <div className="rightMenu">
-                  {user ? (<RightMenuLogined mode={'horizontal'}></RightMenuLogined>) : (<RightMenuLogouted mode={"horizontal"} />)}
+                  {isClient ?
+                    (user ?
+                      (<RightMenuLogined mode={'horizontal'}></RightMenuLogined>)
+                      : (<RightMenuLogouted mode={"horizontal"} />))
+                    : (<RightMenuLogouted mode={"horizontal"} />)}
                 </div>
 
                 <Button className="menuButton" type="text" onClick={showDrawer}>

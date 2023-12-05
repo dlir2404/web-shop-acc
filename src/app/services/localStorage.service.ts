@@ -2,6 +2,7 @@
 
 class storageService {
     setValue = (key: string, value: any) => {
+        if (typeof window === 'undefined') return
         try {
             const serializedValue = JSON.stringify(value)
             localStorage.setItem(key, serializedValue)
@@ -9,8 +10,9 @@ class storageService {
             throw new Error('store serialization failed')
         }
     }
-    
+
     getValue = (key: string) => {
+        if (typeof window === 'undefined') return
         try {
             const serializedValue = localStorage.getItem(key)
             if (!serializedValue) return
@@ -19,7 +21,7 @@ class storageService {
             throw new Error('store deserialization failed')
         }
     }
-    
+
     cleanAll = () => {
         if (typeof window === 'undefined') return
         try {

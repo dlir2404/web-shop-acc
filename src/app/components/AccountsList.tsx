@@ -49,9 +49,8 @@ const AccountsList = () => {
             <div className="grid gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 ">
                 {!isLoading && data?.map((account: IAccount) => {
                     return (
-                        <>
+                        <div key={account.id}>
                             <Card
-                                key={account.id}
                                 hoverable
                                 style={{ width: 250 }}
                                 cover={<img alt="example" src={account?.image_url} />}
@@ -76,7 +75,7 @@ const AccountsList = () => {
                                     <p>Mua ngay</p>
                                 </Button>
                             </Card>
-                        </>
+                        </div>
                     )
                 })}
             </div>
