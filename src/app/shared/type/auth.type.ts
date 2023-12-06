@@ -28,3 +28,11 @@ export interface IRegisterResponse {
     message: string,
     accessToken: string
 }
+
+export interface IChoices {
+    rank: string,
+    heroes_num: string,
+    costumes_num: string,
+    price: string,
+    full_gems: string
+}

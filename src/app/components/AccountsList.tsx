@@ -1,16 +1,25 @@
 import { useQuery } from "@tanstack/react-query"
-import { EditOutlined, EllipsisOutlined, SettingOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-import { Avatar, Card, Skeleton, Switch, Button } from 'antd';
+import { ShoppingCartOutlined, SearchOutlined } from '@ant-design/icons';
+import { Card, Skeleton, Button, Select, Pagination, Form } from 'antd';
 const { Meta } = Card;
+const { Option } = Select;
 import { IAccount, IAccounts } from '../shared/type/account.type';
 import http from '../utils/http'
+import { useState } from "react";
+import { IChoices } from "../shared/type/auth.type";
+
 const AccountsList = () => {
+    const [page, setPage] = useState<any>(1)
+    const [criteria, setCriteria] = useState<string>('')
+    const [choices, setChoices] = useState<IChoices | null>()
+
+    console.log('>>> check choices: ', choices)
 
     let { data, isLoading, isError } = useQuery({
-        queryKey: ['accounts'],
+        queryKey: ['accounts', { _page: page, criteria }],
         queryFn: async () => {
             try {
-                const response = await http.get<IAccounts>('/api/accounts');
+                const response = await http.get<IAccounts>(`/api/accounts?_page=${page}${criteria}`);
                 return response.data; // Assuming the data is in response.data
             } catch (error) {
                 throw new Error('Failed to fetch accounts'); // Handle errors appropriately
@@ -42,10 +51,103 @@ const AccountsList = () => {
         console.log(id)
     }
 
+    const handleChangePage = (page: any, pageSize: any) => {
+        setPage(page)
+    }
 
+    const onRankChange = () => {
+
+    }
+
+    const onFinish = (values: any) => {
+        setChoices(values)
+
+        Object.keys(values).forEach(key => {
+            if (values[key] === undefined) {
+                delete values[key];
+            }
+        });
+        const queryString = Object.entries(values)
+            .map(([key, value]) => `${key}=${value}`)
+            .join('&');
+        setCriteria('&' + queryString)
+    };
 
     return (
         <>
+            <div className="">
+                <Form
+                    // form={form}
+                    name="control-hooks"
+                    onFinish={onFinish}
+                    className="flex gap-4 justify-center bg-white mb-4 rounded-md items-center p-4 flex-wrap"
+                >
+                    <Form.Item name="rank" className="mb-0">
+                        <Select
+                            placeholder={choices ? choices.rank : "-- Chọn mức rank --"}
+                            allowClear
+                        >
+                            <Option value="thachdau">Thách đấu</Option>
+                            <Option value="chientuong">Chiến tướng</Option>
+                            <Option value="caothu">Cao thủ</Option>
+                            <Option value="tinhanh">Tinh Anh</Option>
+                            <Option value="kimcuong">Kim Cương</Option>
+                            <Option value="bachkim">Bạch kim</Option>
+                            <Option value="vang">{'< '}Bạch kim</Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item name="heroes_num" className="mb-0">
+                        <Select
+                            placeholder={choices ? choices.heroes_num : "-- Tướng --"}
+                            allowClear
+                            className="min-w-[180px]"
+                        >
+                            <Option value="tren100">Trên 100 tướng</Option>
+                            <Option value="50den100">Từ 50 đến 100 tướng</Option>
+                            <Option value="duoi50">Dưới 50 tướng</Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item name="costumes_num" className="mb-0">
+                        <Select
+                            placeholder={choices ? choices.costumes_num : "-- Trang phục --"}
+                            allowClear
+                            className="min-w-[210px]"
+                        >
+                            <Option value="tren100">Trên 100 trang phục</Option>
+                            <Option value="50den100">Từ 50 đến 100 trang phục</Option>
+                            <Option value="duoi50">Dưới 50 trang phục</Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item name="price" className="mb-0">
+                        <Select
+                            placeholder={choices ? choices.price : "-- Chọn mức giá --"}
+                            allowClear
+                            className="min-w-[220px]"
+                        >
+                            <Option value="tren10tr">Trên 10.000.000đ</Option>
+                            <Option value="5den10tr">Từ 5.000.000đ đến 9.999.999đ</Option>
+                            <Option value="1den5tr">Từ 1.000.000đ đến 4.999.999đ</Option>
+                            <Option value="500den1tr">Từ 500.000đ đến 999.999đ</Option>
+                            <Option value="2den5tram">Từ 200.000đ đến 499.999đ</Option>
+                            <Option value="duoi200">Dưới 200.000đ</Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item name="gems" className="mb-0 min-w-[130px]">
+                        <Select
+                            placeholder={choices ? choices.full_gems : "-- Full ngọc --"}
+                            allowClear
+                        >
+                            <Option value="full">Full</Option>
+                            <Option value="notfull">Không full</Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item className="mb-0">
+                        <Button className='bg-blue-500 items-center flex' type="primary" htmlType="submit">
+                            <SearchOutlined />Tìm kiếm
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </div>
             <div className="grid gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 ">
                 {!isLoading && data?.map((account: IAccount) => {
                     return (
@@ -78,6 +180,13 @@ const AccountsList = () => {
                         </div>
                     )
                 })}
+            </div>
+            <div className="text-center py-4">
+                <Pagination
+                    defaultCurrent={1}
+                    total={50}
+                    onChange={(page, pageSize) => handleChangePage(page, pageSize)}
+                />
             </div>
         </>
     )
