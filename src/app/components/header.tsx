@@ -76,7 +76,7 @@ const Header = () => {
       }
     ]
     return (
-      <Menu mode={mode} items={items}></Menu>
+      <Menu className="min-w-[300px]" mode={mode} items={items}></Menu>
     )
   }
 
@@ -109,7 +109,7 @@ const Header = () => {
       }
     ]
     return (
-      <Menu mode={mode} items={items}></Menu>
+      <Menu className="min-w-[30px]" mode={mode} items={items}></Menu>
     );
   };
 
