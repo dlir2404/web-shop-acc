@@ -1,20 +1,44 @@
-import { useQuery } from "@tanstack/react-query"
-import { ShoppingCartOutlined, SearchOutlined } from '@ant-design/icons';
-import { Card, Skeleton, Button, Select, Pagination, Form, Modal } from 'antd';
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { ShoppingCartOutlined, SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import { Card, Skeleton, Button, Select, Pagination, Form, Modal, Upload, message } from 'antd';
 const { Meta } = Card;
 const { Option } = Select;
 import { IAccount, IAccounts } from '../shared/type/account.type';
 import http from '../utils/http'
 import { useState } from "react";
 import { IChoices } from "../shared/type/auth.type";
+import imgToUrl from '../services/cloudinary.service';
+import purchaseService from "../services/purchase.service";
+import { IPurchase } from "../shared/type/purchase.type";
+
 
 const AccountsList = () => {
     const [page, setPage] = useState<any>(1)
     const [criteria, setCriteria] = useState<string>('')
     const [choices, setChoices] = useState<IChoices | null>()
     const [isModalPurchaseOpen, setIsModalPurchaseOpen] = useState(false)
-    const [accountToBuy, setAccountToBuy] = useState(null)
+    const [accountToBuy, setAccountToBuy] = useState<IAccount | null>(null)
+    const [loadings, setLoadings] = useState<boolean[]>([]);
 
+    const enterLoading = (index: number) => {
+        setLoadings((prevLoadings) => {
+            const newLoadings = [...prevLoadings];
+            newLoadings[index] = true;
+            return newLoadings;
+        });
+
+        setTimeout(() => {
+            setLoadings((prevLoadings) => {
+                const newLoadings = [...prevLoadings];
+                newLoadings[index] = false;
+                return newLoadings;
+            });
+        }, 10000);
+    };
+
+
+
+    //api
     let { data, isLoading, isError } = useQuery({
         queryKey: ['accounts', { _page: page, criteria }],
         queryFn: async () => {
@@ -25,6 +49,17 @@ const AccountsList = () => {
                 throw new Error('Failed to fetch accounts'); // Handle errors appropriately
             }
         },
+    })
+
+    const purchaseMutation = useMutation({
+        mutationFn: (body: IPurchase) => purchaseService.purchase(body),
+        onSuccess(data, variables, context) {
+            message.success('Đã gửi yêu cầu mua tài khoản.')
+            setIsModalPurchaseOpen(false)
+        },
+        onError(error: any) {
+            message.error(error.response.data.message)
+        }
     })
 
     if (isLoading) {
@@ -47,11 +82,10 @@ const AccountsList = () => {
         )
     }
 
-    const handleBuy = (id: any) => {
-        setAccountToBuy(id)
+    const handleBuy = (account: any) => {
+        setAccountToBuy(account)
         setIsModalPurchaseOpen(true)
     }
-    console.log(isModalPurchaseOpen)
 
     const handleChangePage = (page: any, pageSize: any) => {
         setPage(page)
@@ -74,6 +108,18 @@ const AccountsList = () => {
             .join('&');
         setCriteria('&' + queryString)
     };
+
+    const handleFinishPurchase = async ({ accountToBuy, values }: { accountToBuy: IAccount | null, values: any }) => {
+        let image_url = ''
+        const { img, ...body } = values
+        if (img.file) {
+            image_url = await imgToUrl(img.file)
+        }
+        body.billUrl = image_url
+        body.accountPrice = accountToBuy?.price
+        body.accountId = accountToBuy?.id
+        purchaseMutation.mutate(body)
+    }
 
     return (
         <>
@@ -173,7 +219,7 @@ const AccountsList = () => {
                                 </div>
                                 <Button
                                     className="flex justify-center text-center gap-2 items-center mx-auto"
-                                    onClick={() => { handleBuy(account.id) }}
+                                    onClick={() => { handleBuy(account) }}
                                 >
                                     <ShoppingCartOutlined />
                                     <p>Mua ngay</p>
@@ -201,17 +247,69 @@ const AccountsList = () => {
                         </Button>
                     ]}
                 >
-                    <div className="flex">
+                    <div className="grid grid-cols-2 gap-4">
                         <div className="flex-1">
-                            <h3>Có phải bạn muốn mua tài khoản có ID là: {accountToBuy}</h3>
-                            <p>Vui lòng chuyển khoản tới số tài khoản sau:</p>
-                            <p>STK : 19037597518015</p>
-                            <p>Ngân hàng: Techcombank</p>
-                            <p>Nội dung chuyển khoản: DLSHOP + Id tài khoản muốn mua</p>
+                            <h3>ID tài khoản này là: {accountToBuy?.id}</h3>
+                            <p className='py-1'>Vui lòng chuyển khoản tới số tài khoản sau:</p>
+                            <p className='py-1'>STK : <strong>19037597518015</strong></p>
+                            <p className='py-1'>Ngân hàng: <strong>Techcombank</strong></p>
+                            <p className='py-1'>Số tiền cần chuyển: <strong>{accountToBuy?.price} đ</strong></p>
+                            <p className='py-1'>Nội dung chuyển khoản: </p>
+                            <p className="py-2">DLSHOP + Id tài khoản muốn mua</p>
+                            <p className='text-red-700'>Chú ý: <span className="text-black">Tài khoản của bạn sẽ bị khoá nếu quá 3 lần giao dịch thất bại.</span></p>
                         </div>
                         <div className="flex-1">
                             <img className="w-full" src="/qrcode.jpg" alt="" />
                         </div>
+                    </div>
+                    <div className="mt-10">
+                        <Form
+                            labelWrap={true}
+                            labelCol={{ span: 10 }}
+                            wrapperCol={{ span: 14 }}
+                            layout="horizontal"
+                            style={{ maxWidth: 600 }}
+                            onFinish={(values: any) => handleFinishPurchase({ accountToBuy, values })}
+                        >
+                            <Form.Item
+                                label='Ảnh chụp bill thành công:'
+                                name='img'
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please uploade image'
+                                    }
+                                ]}
+                            >
+                                <Upload
+                                    name='profile'
+                                    listType="picture-card"
+                                    beforeUpload={(file) => {
+                                        return new Promise((resolve, reject) => {
+                                            if (file.size > 2) {
+                                                reject('File size excceed')
+                                            } else {
+                                                resolve('success')
+                                            }
+                                        })
+                                    }}
+                                    maxCount={1}
+                                >
+                                    <div>
+                                        <PlusOutlined />
+                                        <div style={{ marginTop: 8 }}>Upload</div>
+                                    </div>
+                                </Upload>
+                            </Form.Item>
+                            <Button
+                                className="ml-[142px]"
+                                loading={loadings[0]}
+                                onClick={() => enterLoading(0)}
+                                htmlType="submit"
+                            >
+                                Xác nhận đã chuyển khoản
+                            </Button>
+                        </Form>
                     </div>
                 </Modal>
             ) : ''}

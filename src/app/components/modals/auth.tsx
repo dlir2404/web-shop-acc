@@ -100,6 +100,7 @@ const AuthModal = (
                     onFinish={onFinishRegister}
                     onFinishFailed={onFinishFailed}
                     autoComplete="off"
+                    labelAlign='left'
                 >
                     <Form.Item<FieldType>
                         label="Tên tài khoản"
@@ -146,6 +147,7 @@ const AuthModal = (
                     onFinish={onFinish}
                     onFinishFailed={onFinishFailed}
                     autoComplete="off"
+                    labelAlign='left'
                 >
                     <Form.Item<FieldType>
                         label="Tên tài khoản"
