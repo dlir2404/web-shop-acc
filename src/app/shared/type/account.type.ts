@@ -8,4 +8,7 @@ export interface IAccount {
     image_url: string,
 }
 
-export type IAccounts = IAccount[]
+export type IAccounts = {
+    count: number,
+    data: IAccount[]
+}

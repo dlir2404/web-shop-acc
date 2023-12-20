@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { ShoppingCartOutlined, SearchOutlined } from '@ant-design/icons';
-import { Card, Skeleton, Button, Select, Pagination, Form } from 'antd';
+import { Card, Skeleton, Button, Select, Pagination, Form, Modal } from 'antd';
 const { Meta } = Card;
 const { Option } = Select;
 import { IAccount, IAccounts } from '../shared/type/account.type';
@@ -12,8 +12,8 @@ const AccountsList = () => {
     const [page, setPage] = useState<any>(1)
     const [criteria, setCriteria] = useState<string>('')
     const [choices, setChoices] = useState<IChoices | null>()
-
-    console.log('>>> check choices: ', choices)
+    const [isModalPurchaseOpen, setIsModalPurchaseOpen] = useState(false)
+    const [accountToBuy, setAccountToBuy] = useState(null)
 
     let { data, isLoading, isError } = useQuery({
         queryKey: ['accounts', { _page: page, criteria }],
@@ -48,8 +48,10 @@ const AccountsList = () => {
     }
 
     const handleBuy = (id: any) => {
-        console.log(id)
+        setAccountToBuy(id)
+        setIsModalPurchaseOpen(true)
     }
+    console.log(isModalPurchaseOpen)
 
     const handleChangePage = (page: any, pageSize: any) => {
         setPage(page)
@@ -149,7 +151,7 @@ const AccountsList = () => {
                 </Form>
             </div>
             <div className="grid gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 ">
-                {!isLoading && data?.map((account: IAccount) => {
+                {!isLoading && data?.data?.map((account: IAccount) => {
                     return (
                         <div key={account.id}>
                             <Card
@@ -188,6 +190,31 @@ const AccountsList = () => {
                     onChange={(page, pageSize) => handleChangePage(page, pageSize)}
                 />
             </div>
+            {isModalPurchaseOpen ? (
+                <Modal
+                    title="Xác nhận mua tài khoản liên quân"
+                    open={isModalPurchaseOpen}
+                    onCancel={() => setIsModalPurchaseOpen(false)}
+                    footer={[
+                        <Button key="back" onClick={() => setIsModalPurchaseOpen(false)}>
+                            Huỷ
+                        </Button>
+                    ]}
+                >
+                    <div className="flex">
+                        <div className="flex-1">
+                            <h3>Có phải bạn muốn mua tài khoản có ID là: {accountToBuy}</h3>
+                            <p>Vui lòng chuyển khoản tới số tài khoản sau:</p>
+                            <p>STK : 19037597518015</p>
+                            <p>Ngân hàng: Techcombank</p>
+                            <p>Nội dung chuyển khoản: DLSHOP + Id tài khoản muốn mua</p>
+                        </div>
+                        <div className="flex-1">
+                            <img className="w-full" src="/qrcode.jpg" alt="" />
+                        </div>
+                    </div>
+                </Modal>
+            ) : ''}
         </>
     )
 }
