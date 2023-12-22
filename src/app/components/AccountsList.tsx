@@ -1,15 +1,15 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { ShoppingCartOutlined, SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import { Card, Skeleton, Button, Select, Pagination, Form, Modal, Upload, message } from 'antd';
-const { Meta } = Card;
 const { Option } = Select;
 import { IAccount, IAccounts } from '../shared/type/account.type';
 import http from '../utils/http'
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IChoices } from "../shared/type/auth.type";
 import imgToUrl from '../services/cloudinary.service';
 import purchaseService from "../services/purchase.service";
 import { IPurchase } from "../shared/type/purchase.type";
+import localStorageService from "../services/localStorage.service";
 
 
 const AccountsList = () => {
@@ -36,6 +36,18 @@ const AccountsList = () => {
         }, 10000);
     };
 
+    const notLogin = () => {
+        Modal.info({
+            title: 'Bạn chưa đăng nhập.',
+            content: (
+                <div>
+                    <p>Vui lòng đăng nhập để tiếp tục.</p>
+                </div>
+            ),
+            okType: 'default',
+            onOk() { },
+        });
+    };
 
 
     //api
@@ -83,8 +95,13 @@ const AccountsList = () => {
     }
 
     const handleBuy = (account: any) => {
-        setAccountToBuy(account)
-        setIsModalPurchaseOpen(true)
+        const user = localStorageService.getValue('DINH_LINH_SHOP_TOKEN')
+        if (!user) {
+            notLogin()
+        } else {
+            setAccountToBuy(account)
+            setIsModalPurchaseOpen(true)
+        }
     }
 
     const handleChangePage = (page: any, pageSize: any) => {
