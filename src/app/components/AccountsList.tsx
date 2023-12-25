@@ -55,23 +55,23 @@ const AccountsList = () => {
         queryKey: [
             'accounts',
             {
-                _page: page,
-                rank: rank,
-                heroes_num: heroes_num,
-                costumes_num: costumes_num,
-                price: price,
-                full_gems: full_gems
+                // _page: page,
+                // rank: rank,
+                // heroes_num: heroes_num,
+                // costumes_num: costumes_num,
+                // price: price,
+                // full_gems: full_gems
             }],
         queryFn: async () => {
             try {
-                const choices = [['rank', rank], ['heroes_num', heroes_num], ['costumes_num', costumes_num], ['price', price], ['full_gems', full_gems]]
-                const queryString = choices.map((choice: any) => {
+                // const choices = [['rank', rank], ['heroes_num', heroes_num], ['costumes_num', costumes_num], ['price', price], ['full_gems', full_gems]]
+                // const queryString = choices.map((choice: any) => {
 
-                    console.log(choice[0] + ': ', choice[2])
-                    if (choice[1]) {
-                    }
-                })
-                const response = await http.get<IAccounts>(`/api/accounts?_page=${page}&rank=${rank}&heroes_num=${heroes_num}&`);
+                //     console.log(choice[0] + ': ', choice[2])
+                //     if (choice[1]) {
+                //     }
+                // })
+                const response = await http.get<IAccounts>(`/api/accounts?_page=${page}`);
                 return response.data; // Assuming the data is in response.data
             } catch (error) {
                 throw new Error('Failed to fetch accounts'); // Handle errors appropriately
@@ -141,11 +141,11 @@ const AccountsList = () => {
         //     .join('&');
         // setCriteria('&' + queryString)
 
-        setRank(values.rank)
-        setHeroes_num(values.heroes_num)
-        setCostumes_num(values.costumes_num)
-        setPrice(values.price)
-        setFull_gems(values.full_gems)
+        // setRank(values.rank)
+        // setHeroes_num(values.heroes_num)
+        // setCostumes_num(values.costumes_num)
+        // setPrice(values.price)
+        // setFull_gems(values.full_gems)
     };
 
     const handleFinishPurchase = async ({ accountToBuy, values }: { accountToBuy: IAccount | null, values: any }) => {
