@@ -1,10 +1,14 @@
 import React, { useState, ChangeEvent } from 'react';
+import { Upload, Form, Button } from 'antd';
+
+import { PlusOutlined } from '@ant-design/icons';
 
 const ImageUploader = () => {
     const [image, setImage] = useState('');
 
     const handleUpload = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target?.files ? e.target?.files[0] : null
+        console.log(file)
 
         // Kiểm tra xem file có tồn tại không
         if (!file) return;
@@ -39,6 +43,7 @@ const ImageUploader = () => {
                     <img src={image} alt="Uploaded" />
                 </div>
             )}
+
         </div>
     );
 };

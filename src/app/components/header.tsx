@@ -6,14 +6,16 @@ import React, { useState } from "react";
 import AuthModal from "./modals/auth";
 import localStorageService from "../services/localStorage.service";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
+  //hook
   const [visible, setVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState<string | null | undefined>(localStorageService.getValue('DINH_LINH_SHOP_TOKEN'))
   const [defaultActiveKey, setDefaultActiveKey] = useState('');
-
   const [isClient, setIsClient] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     setIsClient(true)
@@ -36,8 +38,8 @@ const Header = () => {
         key: 'info'
       },
       {
-        label: 'Hướng dẫn',
-        key: 'about'
+        label: <p onClick={() => { router.push('/sell') }}>Bán tài khoản</p>,
+        key: 'sell'
       },
       {
         label: 'Liên hệ',
@@ -76,7 +78,7 @@ const Header = () => {
       }
     ]
     return (
-      <Menu mode={mode} items={items}></Menu>
+      <Menu className="min-w-[300px]" mode={mode} items={items}></Menu>
     )
   }
 
@@ -109,7 +111,7 @@ const Header = () => {
       }
     ]
     return (
-      <Menu mode={mode} items={items}></Menu>
+      <Menu className="min-w-[30px]" mode={mode} items={items}></Menu>
     );
   };
 

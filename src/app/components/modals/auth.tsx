@@ -100,6 +100,7 @@ const AuthModal = (
                     onFinish={onFinishRegister}
                     onFinishFailed={onFinishFailed}
                     autoComplete="off"
+                    labelAlign='left'
                 >
                     <Form.Item<FieldType>
                         label="Tên tài khoản"
@@ -146,6 +147,7 @@ const AuthModal = (
                     onFinish={onFinish}
                     onFinishFailed={onFinishFailed}
                     autoComplete="off"
+                    labelAlign='left'
                 >
                     <Form.Item<FieldType>
                         label="Tên tài khoản"
@@ -162,15 +164,6 @@ const AuthModal = (
                     >
                         <Input.Password />
                     </Form.Item>
-
-                    {/* {<Form.Item<FieldType>
-                        name="remember"
-                        valuePropName="checked"
-                        wrapperCol={{ offset: 8, span: 16 }}
-                    >
-                        <Checkbox>Remember me</Checkbox>
-                    </Form.Item>} */}
-
                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                         <Button className='bg-[#1677ff]' type="primary" htmlType="submit">
                             Đăng nhập
@@ -206,7 +199,7 @@ const AuthModal = (
                 </Button>,
 
             ]}>
-                <Tabs defaultActiveKey={defaultActiveKey} renderTabBar={renderTabBar} items={items}></Tabs>;
+                <Tabs defaultActiveKey={defaultActiveKey} renderTabBar={renderTabBar} items={items}></Tabs>
             </Modal>
         </>
     )
