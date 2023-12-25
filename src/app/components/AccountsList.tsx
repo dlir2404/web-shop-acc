@@ -10,16 +10,35 @@ import { IChoices } from "../shared/type/auth.type";
 
 const AccountsList = () => {
     const [page, setPage] = useState<any>(1)
-    const [criteria, setCriteria] = useState<string>('')
-    const [choices, setChoices] = useState<IChoices | null>()
-
-    console.log('>>> check choices: ', choices)
+    // const [criteria, setCriteria] = useState<string>('')
+    // const [choices, setChoices] = useState<IChoices | null>()
+    const [rank, setRank] = useState<string | undefined>(undefined)
+    const [heroes_num, setHeroes_num] = useState<string | undefined>(undefined)
+    const [costumes_num, setCostumes_num] = useState<string | undefined>(undefined)
+    const [price, setPrice] = useState<string | undefined>(undefined)
+    const [full_gems, setFull_gems] = useState<string | undefined>(undefined)
 
     let { data, isLoading, isError } = useQuery({
-        queryKey: ['accounts', { _page: page, criteria }],
+        queryKey: [
+            'accounts',
+            {
+                _page: page,
+                rank: rank,
+                heroes_num: heroes_num,
+                costumes_num: costumes_num,
+                price: price,
+                full_gems: full_gems
+            }],
         queryFn: async () => {
             try {
-                const response = await http.get<IAccounts>(`/api/accounts?_page=${page}${criteria}`);
+                const choices = [['rank', rank], ['heroes_num', heroes_num], ['costumes_num', costumes_num], ['price', price], ['full_gems', full_gems]]
+                const queryString = choices.map((choice: any) => {
+
+                    console.log(choice[0] + ': ', choice[2])
+                    if (choice[1]) {
+                    }
+                })
+                const response = await http.get<IAccounts>(`/api/accounts?_page=${page}&rank=${rank}&heroes_num=${heroes_num}&`);
                 return response.data; // Assuming the data is in response.data
             } catch (error) {
                 throw new Error('Failed to fetch accounts'); // Handle errors appropriately
@@ -60,17 +79,23 @@ const AccountsList = () => {
     }
 
     const onFinish = (values: any) => {
-        setChoices(values)
+        // setChoices(values)
 
-        Object.keys(values).forEach(key => {
-            if (values[key] === undefined) {
-                delete values[key];
-            }
-        });
-        const queryString = Object.entries(values)
-            .map(([key, value]) => `${key}=${value}`)
-            .join('&');
-        setCriteria('&' + queryString)
+        // Object.keys(values).forEach(key => {
+        //     if (values[key] === undefined) {
+        //         delete values[key];
+        //     }
+        // });
+        // const queryString = Object.entries(values)
+        //     .map(([key, value]) => `${key}=${value}`)
+        //     .join('&');
+        // setCriteria('&' + queryString)
+
+        setRank(values.rank)
+        setHeroes_num(values.heroes_num)
+        setCostumes_num(values.costumes_num)
+        setPrice(values.price)
+        setFull_gems(values.full_gems)
     };
 
     return (
@@ -84,7 +109,7 @@ const AccountsList = () => {
                 >
                     <Form.Item name="rank" className="mb-0">
                         <Select
-                            placeholder={choices ? choices.rank : "-- Chọn mức rank --"}
+                            placeholder="-- Chọn mức rank --"
                             allowClear
                         >
                             <Option value="thachdau">Thách đấu</Option>
@@ -98,7 +123,7 @@ const AccountsList = () => {
                     </Form.Item>
                     <Form.Item name="heroes_num" className="mb-0">
                         <Select
-                            placeholder={choices ? choices.heroes_num : "-- Tướng --"}
+                            placeholder="-- Tướng --"
                             allowClear
                             className="min-w-[180px]"
                         >
@@ -109,7 +134,7 @@ const AccountsList = () => {
                     </Form.Item>
                     <Form.Item name="costumes_num" className="mb-0">
                         <Select
-                            placeholder={choices ? choices.costumes_num : "-- Trang phục --"}
+                            placeholder="-- Trang phục --"
                             allowClear
                             className="min-w-[210px]"
                         >
@@ -120,7 +145,7 @@ const AccountsList = () => {
                     </Form.Item>
                     <Form.Item name="price" className="mb-0">
                         <Select
-                            placeholder={choices ? choices.price : "-- Chọn mức giá --"}
+                            placeholder="-- Chọn mức giá --"
                             allowClear
                             className="min-w-[220px]"
                         >
@@ -132,9 +157,9 @@ const AccountsList = () => {
                             <Option value="duoi200">Dưới 200.000đ</Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item name="gems" className="mb-0 min-w-[130px]">
+                    <Form.Item name="full_gems" className="mb-0 min-w-[130px]">
                         <Select
-                            placeholder={choices ? choices.full_gems : "-- Full ngọc --"}
+                            placeholder="-- Full ngọc --"
                             allowClear
                         >
                             <Option value="full">Full</Option>
