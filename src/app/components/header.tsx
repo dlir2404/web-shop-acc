@@ -54,6 +54,7 @@ const Header = () => {
     setUser(null)
     queryClient.invalidateQueries({ queryKey: ['verify'] })
     message.success('Đăng xuất thành công')
+    router.push('/')
   }
 
   const LeftMenu = ({ mode }: { mode: any }) => {
