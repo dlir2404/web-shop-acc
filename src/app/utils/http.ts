@@ -3,8 +3,8 @@ import localStorageService from '../services/localStorage.service'
 
 class Http {
     instance: AxiosInstance
-    constructor() {
-        const token = localStorageService.getValue('DINH_LINH_SHOP_TOKEN')
+    constructor(token : string) {
+        // const token = localStorageService.getValue('DINH_LINH_SHOP_TOKEN')
         this.instance = axios.create({
             baseURL: 'http://localhost:8080',
             timeout: 10000,
@@ -16,6 +16,6 @@ class Http {
     }
 }
 
-const http = new Http().instance
+// const http = new Http().instance
 
-export default http
+export default Http

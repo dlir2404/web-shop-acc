@@ -1,12 +1,14 @@
 'use client'
 import { Menu, Avatar, Drawer, Layout, message } from "antd";
-import { UserOutlined, CodeOutlined, LogoutOutlined, MenuOutlined } from "@ant-design/icons";
+import { UserOutlined, ShoppingCartOutlined, LogoutOutlined, MenuOutlined } from "@ant-design/icons";
 import Button from "antd/es/button";
 import React, { useState } from "react";
 import AuthModal from "./modals/auth";
 import localStorageService from "../services/localStorage.service";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 
 const Header = () => {
   //hook
@@ -16,6 +18,32 @@ const Header = () => {
   const [defaultActiveKey, setDefaultActiveKey] = useState('');
   const [isClient, setIsClient] = useState(false)
   const router = useRouter()
+  const queryClient = useQueryClient()
+
+  const verifyLogin = useQuery({
+    queryKey: ['verify'],
+    queryFn: async () => {
+      const token = localStorageService.getValue('DINH_LINH_SHOP_TOKEN')
+      if (!token) {
+        const response = await fetch('http://localhost:8080/api/auth/me', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        });
+        return response
+      } else {
+        const response = await fetch('http://localhost:8080/api/auth/me', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token,
+          },
+        });
+        return response
+      }
+    }
+  })
 
   useEffect(() => {
     setIsClient(true)
@@ -24,6 +52,7 @@ const Header = () => {
   const handleLogout = () => {
     localStorageService.cleanAll()
     setUser(null)
+    queryClient.invalidateQueries({ queryKey: ['verify'] })
     message.success('Đăng xuất thành công')
   }
 
@@ -31,11 +60,13 @@ const Header = () => {
     const items = [
       {
         label: 'Trang chủ',
-        key: 'homepage'
+        key: 'homepage',
+        onClick: () => router.push('/')
       },
       {
-        label: 'Thông tin shop',
-        key: 'info'
+        label: 'Các yêu cầu mua',
+        key: 'info',
+        onClick: () => router.push('/purchased')
       },
       {
         label: <p onClick={() => { router.push('/sell') }}>Bán tài khoản</p>,
@@ -87,14 +118,15 @@ const Header = () => {
       {
         label: <>
           <Avatar icon={<UserOutlined />} />
-          <span className="username">User name</span>
+          <span className="text-black ml-4">{ }</span>
         </>,
         key: 'submenu',
         children: [
           {
-            label: 'Projects',
+            label: 'Các yêu cầu mua',
             key: 'project',
-            icon: <CodeOutlined />
+            icon: <ShoppingCartOutlined />,
+            onClick: () => router.push('/purchased')
           },
           {
             label: 'Profile',
@@ -111,9 +143,20 @@ const Header = () => {
       }
     ]
     return (
-      <Menu className="min-w-[30px]" mode={mode} items={items}></Menu>
+      <Menu className="min-w-[30px] w-[200px]" mode={mode} items={items}></Menu>
     );
   };
+
+  const renderRightMenu = () => {
+    if (isClient) {
+      if (!(verifyLogin.data?.status !== 200 || verifyLogin.isError)) {
+        if (user) {
+          return (<RightMenuLogined mode={'horizontal'}></RightMenuLogined>)
+        }
+      }
+    }
+    return (<RightMenuLogouted mode={"horizontal"} />)
+  }
 
   const showDrawer = () => {
     setVisible(!visible);
@@ -126,18 +169,14 @@ const Header = () => {
           <Layout.Header className="nav-header">
             <div className="container mx-auto">
               <div className="logo">
-                <a href="/"><h3 className="brand-font">Dinh Linh's Shop Acc</h3></a>
+                <Link href="/"><h3 className="brand-font">Dinh Linh's Shop Acc</h3></Link>
               </div>
               <div className="navbar-menu">
                 <div className="leftMenu">
                   <LeftMenu mode={"horizontal"} />
                 </div>
                 <div className="rightMenu">
-                  {isClient ?
-                    (user ?
-                      (<RightMenuLogined mode={'horizontal'}></RightMenuLogined>)
-                      : (<RightMenuLogouted mode={"horizontal"} />))
-                    : (<RightMenuLogouted mode={"horizontal"} />)}
+                  {renderRightMenu()}
                 </div>
 
                 <Button className="menuButton" type="text" onClick={showDrawer}>

@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { ShoppingCartOutlined, SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import { ShoppingCartOutlined, SearchOutlined, PlusOutlined, CopyOutlined } from '@ant-design/icons';
 import { Card, Skeleton, Button, Select, Pagination, Form, Modal, Upload, message } from 'antd';
 const { Option } = Select;
 import { IAccount, IAccounts } from '../shared/type/account.type';
-import http from '../utils/http'
+import Http from '../utils/http'
 import { useState, useEffect } from "react";
 import { IChoices } from "../shared/type/auth.type";
 import imgToUrl from '../services/cloudinary.service';
@@ -19,6 +19,7 @@ const AccountsList = () => {
     const [isModalPurchaseOpen, setIsModalPurchaseOpen] = useState(false)
     const [accountToBuy, setAccountToBuy] = useState<IAccount | null>(null)
     const [loadings, setLoadings] = useState<boolean[]>([]);
+    const http = new Http('no-token').instance
 
     const enterLoading = (index: number) => {
         setLoadings((prevLoadings) => {
@@ -245,11 +246,11 @@ const AccountsList = () => {
                                 cover={<img alt="example" src={account?.image_url} />}
                                 bodyStyle={{ padding: '10px' }}
                             >
-                                {/* <Meta title="Europe Street beat" description="www.instagram.com" /> */}
                                 <div className="flex gap-1 min-h-[66px]">
                                     <div>
                                         <p>Rank: <strong>{account.rank}</strong></p>
                                         <p>Trang phục: <strong>{account.costumes_num}</strong></p>
+                                        <p>Giá: <strong>{account.price}{' đ'}</strong></p>
                                     </div>
                                     <div>
                                         <p>Tướng: <strong>{account.heroes_num}</strong></p>
@@ -290,7 +291,13 @@ const AccountsList = () => {
                         <div className="flex-1">
                             <h3>ID tài khoản này là: {accountToBuy?.id}</h3>
                             <p className='py-1'>Vui lòng chuyển khoản tới số tài khoản sau:</p>
-                            <p className='py-1'>STK : <strong>19037597518015</strong></p>
+                            <p className='py-1'>STK :
+                                <strong>19037597518015 </strong>
+                                <CopyOutlined onClick={() => {
+                                    navigator.clipboard.writeText('19037597518015')
+                                    message.success('Đã sao chép')
+                                }} />
+                            </p>
                             <p className='py-1'>Ngân hàng: <strong>Techcombank</strong></p>
                             <p className='py-1'>Số tiền cần chuyển: <strong>{accountToBuy?.price} đ</strong></p>
                             <p className='py-1'>Nội dung chuyển khoản: </p>

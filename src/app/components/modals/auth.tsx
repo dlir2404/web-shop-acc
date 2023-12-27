@@ -3,7 +3,7 @@ import type { TabsProps } from 'antd';
 import { Tabs, theme } from 'antd';
 import StickyBox from 'react-sticky-box';
 import { Checkbox, Form, Input } from 'antd';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import authService from '@/app/services/auth.service';
 import { ILogin, ILoginResponse, IRegister } from '@/app/shared/type/auth.type';
 import { message } from 'antd';
@@ -37,6 +37,8 @@ const AuthModal = (
         </StickyBox>
     );
 
+    const queryClient = useQueryClient()
+
 
     //logic
     const onFinish = (values: any) => {
@@ -67,6 +69,7 @@ const AuthModal = (
             message.success('Đăng nhập thành công.')
             setIsModalOpen(false)
             localStorageService.setValue('DINH_LINH_SHOP_TOKEN', 'Bearer ' + data.data.accessToken)
+            queryClient.invalidateQueries({ queryKey: ['verify'] })
             setUser(data.data.username)
         },
         onError(error: any) {
@@ -79,6 +82,7 @@ const AuthModal = (
         onSuccess(data, variables, context) {
             message.success('Đăng ký thành công.')
             localStorageService.setValue('DINH_LINH_SHOP_TOKEN', 'Bearer ' + data.data.accessToken)
+            queryClient.invalidateQueries({ queryKey: ['verify'] })
             setUser(data.data.username)
             setIsModalOpen(false)
         },
