@@ -12,6 +12,7 @@ import localStorageService from '@/app/services/localStorage.service';
 type FieldType = {
     username?: string;
     password?: string;
+    passwordAgain?: string;
     remember?: string;
 };
 
@@ -124,8 +125,20 @@ const AuthModal = (
 
                     <Form.Item<FieldType>
                         label="Nhập lại mật khẩu"
-                        name="password"
-                        rules={[{ required: true, message: 'Nhập lại mật khẩu!' }]}
+                        name="passwordAgain"
+                        dependencies={['password']}
+                        rules={[{
+                            required: true,
+                            message: 'Nhập lại mật khẩu!',
+
+                        }, ({ getFieldValue }) => ({
+                            validator(_, value) {
+                                if (!value || getFieldValue('password') === value) {
+                                    return Promise.resolve();
+                                }
+                                return Promise.reject(new Error('Mật khẩu không khớp!'));
+                            },
+                        })]}
                     >
                         <Input.Password />
                     </Form.Item>

@@ -45,7 +45,9 @@ const SellHistory = () => {
 
     const accountSellInfo = (account: any) => {
         Modal.info({
+            zIndex: 1,
             title: 'Thông tin acc',
+            closable: true,
             content: (
                 <div>
                     <p className='py-2'>Số tướng: <strong>{account.heroes_num}</strong></p>
@@ -115,7 +117,7 @@ const SellHistory = () => {
                 } else if (record.status === 'Giao dịch hoàn tất') {
                     return (
                         <>
-                            <Image src={record.billUrl} className='w-100'></Image>
+                            <Image width={100} src={record.billUrl} className='w-100'></Image>
                         </>
                     )
                 } else {

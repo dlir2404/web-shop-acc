@@ -1,5 +1,5 @@
 import { ShoppingCartOutlined } from '@ant-design/icons';
-import { Card, Button, Skeleton } from 'antd';
+import { Card, Button, Skeleton, Empty } from 'antd';
 import localStorageService from "../services/localStorage.service";
 import { IAccount, IAccounts } from '../shared/type/account.type';
 
@@ -49,6 +49,14 @@ const AccountsList = ({
         return (
             <div className="grid gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 ">
                 {skeletonItems}
+            </div>
+        )
+    }
+
+    if (!(data?.count > 0)) {
+        return (
+            <div className="bg-white rounded-md p-10 ">
+                <Empty></Empty>
             </div>
         )
     }

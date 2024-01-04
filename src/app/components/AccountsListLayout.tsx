@@ -16,26 +16,10 @@ import AccountsList from "./AccountList";
 const AccountsListLayout = () => {
     const [isModalPurchaseOpen, setIsModalPurchaseOpen] = useState(false)
     const [accountToBuy, setAccountToBuy] = useState<IAccount | null>(null)
-    const [loadings, setLoadings] = useState<boolean[]>([]);
+    const [loadings, setLoadings] = useState<boolean>(false);
     const http = new Http('no-token').instance
     const queryClient = useQueryClient()
     const [params, setParams] = useState<any>({ _page: 1 })
-
-    const enterLoading = (index: number) => {
-        setLoadings((prevLoadings) => {
-            const newLoadings = [...prevLoadings];
-            newLoadings[index] = true;
-            return newLoadings;
-        });
-
-        setTimeout(() => {
-            setLoadings((prevLoadings) => {
-                const newLoadings = [...prevLoadings];
-                newLoadings[index] = false;
-                return newLoadings;
-            });
-        }, 10000);
-    };
 
     const notLogin = () => {
         Modal.info({
@@ -73,6 +57,7 @@ const AccountsListLayout = () => {
         onSuccess(data, variables, context) {
             message.success('Đã gửi yêu cầu mua tài khoản.')
             setIsModalPurchaseOpen(false)
+            setLoadings(false)
             queryClient.invalidateQueries({ queryKey: ['accounts'] })
         },
         onError(error: any) {
@@ -171,8 +156,8 @@ const AccountsListLayout = () => {
                             placeholder="-- Full ngọc --"
                             allowClear
                         >
-                            <Option value="true">Full</Option>
-                            <Option value="false">Không full</Option>
+                            <Option value="1">Full</Option>
+                            <Option value="0">Không full</Option>
                         </Select>
                     </Form.Item>
                     <Form.Item className="mb-0">
@@ -264,8 +249,8 @@ const AccountsListLayout = () => {
                             </Form.Item>
                             <Button
                                 className="ml-[142px]"
-                                loading={loadings[0]}
-                                onClick={() => enterLoading(0)}
+                                loading={loadings}
+                                onClick={() => setLoadings(true)}
                                 htmlType="submit"
                             >
                                 Xác nhận đã chuyển khoản
