@@ -1,25 +1,25 @@
-import { useMutation, useQuery } from "@tanstack/react-query"
-import { ShoppingCartOutlined, SearchOutlined, PlusOutlined, CopyOutlined } from '@ant-design/icons';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { SearchOutlined, PlusOutlined, CopyOutlined } from '@ant-design/icons';
 import { Card, Skeleton, Button, Select, Pagination, Form, Modal, Upload, message } from 'antd';
 const { Option } = Select;
 import { IAccount, IAccounts } from '../shared/type/account.type';
 import Http from '../utils/http'
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { IChoices } from "../shared/type/auth.type";
 import imgToUrl from '../services/cloudinary.service';
 import purchaseService from "../services/purchase.service";
 import { IPurchase } from "../shared/type/purchase.type";
 import localStorageService from "../services/localStorage.service";
+import AccountsList from "./AccountList";
 
 
-const AccountsList = () => {
-    const [page, setPage] = useState<any>(1)
-    const [criteria, setCriteria] = useState<string>('')
-    const [choices, setChoices] = useState<IChoices | null>()
+const AccountsListLayout = () => {
     const [isModalPurchaseOpen, setIsModalPurchaseOpen] = useState(false)
     const [accountToBuy, setAccountToBuy] = useState<IAccount | null>(null)
     const [loadings, setLoadings] = useState<boolean[]>([]);
     const http = new Http('no-token').instance
+    const queryClient = useQueryClient()
+    const [params, setParams] = useState<any>({ _page: 1 })
 
     const enterLoading = (index: number) => {
         setLoadings((prevLoadings) => {
@@ -56,23 +56,11 @@ const AccountsList = () => {
         queryKey: [
             'accounts',
             {
-                // _page: page,
-                // rank: rank,
-                // heroes_num: heroes_num,
-                // costumes_num: costumes_num,
-                // price: price,
-                // full_gems: full_gems
+                params: params
             }],
         queryFn: async () => {
             try {
-                // const choices = [['rank', rank], ['heroes_num', heroes_num], ['costumes_num', costumes_num], ['price', price], ['full_gems', full_gems]]
-                // const queryString = choices.map((choice: any) => {
-
-                //     console.log(choice[0] + ': ', choice[2])
-                //     if (choice[1]) {
-                //     }
-                // })
-                const response = await http.get<IAccounts>(`/api/accounts?_page=${page}`);
+                const response = await http.get<IAccounts>(`/api/accounts`, { params });
                 return response.data; // Assuming the data is in response.data
             } catch (error) {
                 throw new Error('Failed to fetch accounts'); // Handle errors appropriately
@@ -85,68 +73,26 @@ const AccountsList = () => {
         onSuccess(data, variables, context) {
             message.success('Đã gửi yêu cầu mua tài khoản.')
             setIsModalPurchaseOpen(false)
+            queryClient.invalidateQueries({ queryKey: ['accounts'] })
         },
         onError(error: any) {
             message.error(error.response.data.message)
         }
     })
 
-    if (isLoading) {
-        const skeletonItems = Array.from({ length: 10 }, (_, index) => (
-            <Card
-                key={index}
-                style={{ width: 250, marginTop: 16 }}
-                actions={[
-                    <Skeleton.Button key={`button-${index}`} />
-                ]}
-            >
-                <Skeleton.Image key={`image-${index}`} active className="mb-4 w-full h-80px" />
-                <Skeleton key={`skeleton-${index}`} title={false} paragraph={{ rows: 2 }} />
-            </Card>
-        ));
-        return (
-            <div className="grid gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 ">
-                {skeletonItems}
-            </div>
-        )
-    }
-
-    const handleBuy = (account: any) => {
-        const user = localStorageService.getValue('DINH_LINH_SHOP_TOKEN')
-        if (!user) {
-            notLogin()
-        } else {
-            setAccountToBuy(account)
-            setIsModalPurchaseOpen(true)
-        }
-    }
-
     const handleChangePage = (page: any, pageSize: any) => {
-        setPage(page)
-    }
-
-    const onRankChange = () => {
-
+        const newParams = {
+            _page: page,
+            ...params
+        }
+        newParams._page = page
+        setParams(newParams)
     }
 
     const onFinish = (values: any) => {
-        // setChoices(values)
-
-        // Object.keys(values).forEach(key => {
-        //     if (values[key] === undefined) {
-        //         delete values[key];
-        //     }
-        // });
-        // const queryString = Object.entries(values)
-        //     .map(([key, value]) => `${key}=${value}`)
-        //     .join('&');
-        // setCriteria('&' + queryString)
-
-        // setRank(values.rank)
-        // setHeroes_num(values.heroes_num)
-        // setCostumes_num(values.costumes_num)
-        // setPrice(values.price)
-        // setFull_gems(values.full_gems)
+        const newParams = values
+        newParams._page = params._page
+        setParams(values)
     };
 
     const handleFinishPurchase = async ({ accountToBuy, values }: { accountToBuy: IAccount | null, values: any }) => {
@@ -170,21 +116,21 @@ const AccountsList = () => {
                     onFinish={onFinish}
                     className="flex gap-4 justify-center bg-white mb-4 rounded-md items-center p-4 flex-wrap"
                 >
-                    <Form.Item name="rank" className="mb-0">
+                    <Form.Item name="rank" className="mb-0" initialValue={params?.rank}>
                         <Select
                             placeholder="-- Chọn mức rank --"
                             allowClear
                         >
-                            <Option value="thachdau">Thách đấu</Option>
-                            <Option value="chientuong">Chiến tướng</Option>
-                            <Option value="caothu">Cao thủ</Option>
-                            <Option value="tinhanh">Tinh Anh</Option>
-                            <Option value="kimcuong">Kim Cương</Option>
-                            <Option value="bachkim">Bạch kim</Option>
-                            <Option value="vang">{'< '}Bạch kim</Option>
+                            <Option value="Thách đấu">Thách đấu</Option>
+                            <Option value="Chiến tướng">Chiến tướng</Option>
+                            <Option value="Cao thủ">Cao thủ</Option>
+                            <Option value="Tinh Anh">Tinh Anh</Option>
+                            <Option value="Kim Cương">Kim Cương</Option>
+                            <Option value="Bạch kim">Bạch kim</Option>
+                            <Option value="Vàng">{'< '}Bạch kim</Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item name="heroes_num" className="mb-0">
+                    <Form.Item name="heroes_num" className="mb-0" initialValue={params?.heroes_num}>
                         <Select
                             placeholder="-- Tướng --"
                             allowClear
@@ -195,7 +141,7 @@ const AccountsList = () => {
                             <Option value="duoi50">Dưới 50 tướng</Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item name="costumes_num" className="mb-0">
+                    <Form.Item name="costumes_num" className="mb-0" initialValue={params?.costumes_num}>
                         <Select
                             placeholder="-- Trang phục --"
                             allowClear
@@ -206,27 +152,27 @@ const AccountsList = () => {
                             <Option value="duoi50">Dưới 50 trang phục</Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item name="price" className="mb-0">
+                    <Form.Item name="price" className="mb-0" initialValue={params?.price}>
                         <Select
                             placeholder="-- Chọn mức giá --"
                             allowClear
                             className="min-w-[220px]"
                         >
                             <Option value="tren10tr">Trên 10.000.000đ</Option>
-                            <Option value="5den10tr">Từ 5.000.000đ đến 9.999.999đ</Option>
-                            <Option value="1den5tr">Từ 1.000.000đ đến 4.999.999đ</Option>
-                            <Option value="500den1tr">Từ 500.000đ đến 999.999đ</Option>
-                            <Option value="2den5tram">Từ 200.000đ đến 499.999đ</Option>
+                            <Option value="5den10tr">Từ 5.000.000đ đến 10.000.000đ</Option>
+                            <Option value="1den5tr">Từ 1.000.000đ đến 5.000.000đ</Option>
+                            <Option value="500den1tr">Từ 500.000đ đến 1.000.000đ</Option>
+                            <Option value="2den5tram">Từ 200.000đ đến 500.000đ</Option>
                             <Option value="duoi200">Dưới 200.000đ</Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item name="full_gems" className="mb-0 min-w-[130px]">
+                    <Form.Item name="is_full_gems" className="mb-0 min-w-[130px]" initialValue={params?.is_full_gems}>
                         <Select
                             placeholder="-- Full ngọc --"
                             allowClear
                         >
-                            <Option value="full">Full</Option>
-                            <Option value="notfull">Không full</Option>
+                            <Option value="true">Full</Option>
+                            <Option value="false">Không full</Option>
                         </Select>
                     </Form.Item>
                     <Form.Item className="mb-0">
@@ -236,43 +182,11 @@ const AccountsList = () => {
                     </Form.Item>
                 </Form>
             </div>
-            <div className="grid gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 ">
-                {!isLoading && data?.data?.map((account: IAccount) => {
-                    return (
-                        <div key={account.id}>
-                            <Card
-                                hoverable
-                                style={{ width: 250 }}
-                                cover={<img alt="example" src={account?.image_url} />}
-                                bodyStyle={{ padding: '10px' }}
-                            >
-                                <div className="flex gap-1 min-h-[66px]">
-                                    <div>
-                                        <p>Rank: <strong>{account.rank}</strong></p>
-                                        <p>Trang phục: <strong>{account.costumes_num}</strong></p>
-                                        <p>Giá: <strong>{account.price}{' đ'}</strong></p>
-                                    </div>
-                                    <div>
-                                        <p>Tướng: <strong>{account.heroes_num}</strong></p>
-                                        <p>Full ngọc: <strong>{account.is_full_gems ? (account.is_full_gems == true ? 'Đúng' : 'Không') : 'Không'}</strong></p>
-                                    </div>
-                                </div>
-                                <Button
-                                    className="flex justify-center text-center gap-2 items-center mx-auto"
-                                    onClick={() => { handleBuy(account) }}
-                                >
-                                    <ShoppingCartOutlined />
-                                    <p>Mua ngay</p>
-                                </Button>
-                            </Card>
-                        </div>
-                    )
-                })}
-            </div>
+            <AccountsList isLoading={isLoading} data={data} setAccountToBuy={setAccountToBuy} setIsModalPurchaseOpen={setIsModalPurchaseOpen} notLogin={notLogin} params={params}></AccountsList>
             <div className="text-center py-4">
                 <Pagination
                     defaultCurrent={1}
-                    total={50}
+                    total={data?.count}
                     onChange={(page, pageSize) => handleChangePage(page, pageSize)}
                 />
             </div>
@@ -281,6 +195,7 @@ const AccountsList = () => {
                     title="Xác nhận mua tài khoản liên quân"
                     open={isModalPurchaseOpen}
                     onCancel={() => setIsModalPurchaseOpen(false)}
+                    style={{ top: 15 }}
                     footer={[
                         <Button key="back" onClick={() => setIsModalPurchaseOpen(false)}>
                             Huỷ
@@ -363,4 +278,4 @@ const AccountsList = () => {
     )
 }
 
-export default AccountsList
+export default AccountsListLayout

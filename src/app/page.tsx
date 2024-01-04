@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import ImageUploader from './components/ImageUploader'
-import AccountsList from './components/AccountsList';
+import AccountsList from './components/AccountsListLayout';
 
 
 export default function Home() {

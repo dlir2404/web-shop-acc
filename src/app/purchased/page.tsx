@@ -102,7 +102,7 @@ const Purchased = () => {
                 align: 'center',
                 render: (_, { billUrl }) => (
                     <Image
-                        width={200}
+                        width={100}
                         src={billUrl}
                     />
                 )
