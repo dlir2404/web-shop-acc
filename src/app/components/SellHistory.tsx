@@ -129,15 +129,19 @@ const SellHistory = () => {
 
     //logic
     const handleFinish = async (values: any) => {
-        setIsButtonLoading(true)
-        let image_url = ''
-        const { img, ...body } = values
-        if (img.file) {
-            image_url = await imgToUrl(img.file)
+        try {
+            let image_url = ''
+            const { img, ...body } = values
+            setIsButtonLoading(true)
+            if (img.file) {
+                image_url = await imgToUrl(img.file)
+            }
+            body.payUrl = image_url
+            body.id = sellId
+            payInfoMutation.mutate(body)
+        } catch (error) {
+            message.error('Có lỗi xảy ra')
         }
-        body.payUrl = image_url
-        body.id = sellId
-        payInfoMutation.mutate(body)
     }
 
     return (

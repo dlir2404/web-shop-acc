@@ -81,15 +81,20 @@ const AccountsListLayout = () => {
     };
 
     const handleFinishPurchase = async ({ accountToBuy, values }: { accountToBuy: IAccount | null, values: any }) => {
-        let image_url = ''
-        const { img, ...body } = values
-        if (img.file) {
-            image_url = await imgToUrl(img.file)
+        try {
+            let image_url = ''
+            const { img, ...body } = values
+            setLoadings(true)
+            if (img.file) {
+                image_url = await imgToUrl(img.file)
+            }
+            body.billUrl = image_url
+            body.accountPrice = accountToBuy?.price
+            body.accountId = accountToBuy?.id
+            purchaseMutation.mutate(body)
+        } catch (error) {
+            message.error('Gửi yêu cầu mua không thành công')
         }
-        body.billUrl = image_url
-        body.accountPrice = accountToBuy?.price
-        body.accountId = accountToBuy?.id
-        purchaseMutation.mutate(body)
     }
 
     return (
@@ -250,7 +255,6 @@ const AccountsListLayout = () => {
                             <Button
                                 className="ml-[142px]"
                                 loading={loadings}
-                                onClick={() => setLoadings(true)}
                                 htmlType="submit"
                             >
                                 Xác nhận đã chuyển khoản

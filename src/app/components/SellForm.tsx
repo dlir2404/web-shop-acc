@@ -32,15 +32,19 @@ const SellForm = () => {
 
 
     const handleFinish = async (values: any) => {
-        setIsButtonLoading(true)
-        let image_url = ''
-        console.log(values)
-        const { img, ...body } = values
-        if (img.file) {
-            image_url = await imgToUrl(img.file)
+        try {
+            setIsButtonLoading(true)
+            let image_url = ''
+            console.log(values)
+            const { img, ...body } = values
+            if (img.file) {
+                image_url = await imgToUrl(img.file)
+            }
+            body.image_url = image_url
+            sellMutation.mutate(body)
+        } catch (error) {
+            message.error('Gửi yêu cầu không thành công')
         }
-        body.image_url = image_url
-        sellMutation.mutate(body)
     }
     return (
         <>

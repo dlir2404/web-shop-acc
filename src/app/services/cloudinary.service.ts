@@ -1,3 +1,5 @@
+import { message } from "antd";
+
 const imgToUrl = async (file: File) => {
 
     // Kiểm tra xem file có tồn tại không
@@ -22,6 +24,7 @@ const imgToUrl = async (file: File) => {
         }
     } catch (error) {
         console.error('Error during upload:', error);
+        message.error('Upload ảnh bị lỗi')
         return
     }
 }
